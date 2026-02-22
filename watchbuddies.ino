@@ -1,6 +1,3 @@
-///uses Adafruit display instead, which saves memory. still glitchy, with words disappearing and guy glitching into naptime
-// and hugs are not working unfortunately but is a lil better i think
-
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -27,7 +24,7 @@ String personalUID = "0"; /// "96:0B:6C:96";
 
 unsigned long cardDetectedAt = 0;
 bool cardPresent = false;
-const unsigned long CONNECTED_DURATION = 5000 * 60;
+const unsigned long CONNECTED_DURATION = 1000 ;
 int counter = 0;
 int curFrame=1;
 
@@ -492,14 +489,8 @@ int randFrame(){
 void hugging(void){
   display.drawXBitmap(0, 0, epd_bitmap_allArray[counter%17], 35, 35, WHITE); // draw frame of the animation
 
-
-	if (counter%17==16){
-    if (random(0,1)>0.4){
-      curFrame=0;
-    }
-    else{
-      curFrame=randFrame();
-    }
+	if (counter > 64){
+    curFrame=randFrame();
     counter=0;
   }
 }
@@ -507,13 +498,8 @@ void hugging(void){
 void idling(void){
   display.drawXBitmap(0, 0, epd_bitmap_allArray1[counter%9], 34, 34, WHITE); // draw frame of the animation
 
-	if (counter%9==8){
-    if (random(0,1)>0.7){
-      curFrame=1;
-    }
-    else{
-      curFrame=randFrame();
-    }
+	if (counter > textScreenTime){
+    curFrame = randFrame();
     counter=0;
   }
 }
@@ -555,7 +541,7 @@ void characterSide() {
       idling();
       break;
     case 2: 
-      idling(); ///tosleep();
+      tosleep();
       break;
     case 3:
       sleeping();
@@ -582,6 +568,7 @@ void connectivity() {
         cardPresent = true;
         cardDetectedAt = millis();
         textIteration = textScreenTime;
+        curFrame = 0;
     }
     rfid.PICC_HaltA();
     rfid.PCD_StopCrypto1();
